@@ -2,58 +2,64 @@ import os
 import sys
 import random
 import math
-import re
-import time
 import numpy as np
-import tensorflow as tf
+import skimage.io
 import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
 
-ROOT_DIR = os.path.abspath("/app")
-
+ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR)
 
 from mrcnn import utils
-from mrcnn import visualize
-from mrcnn.visualize import display_images
 import mrcnn.model as modellib
-from mrcnn.model import log
+from mrcnn import visualize
 
-MODEL_DIR = os.path.join(ROOT_DIR, "logs")
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
-
+sys.path.append(os.path.join(ROOT_DIR, "samples/coco/"))  # To find local version
 import coco
-config = coco.CocoConfig()
-COCO_DIR = "./coco_data/"
 
-class InferenceConfig(config.__class__):
-    # Run detection on one image at a time
+# Directory to save logs and trained model
+MODEL_DIR = os.path.join(ROOT_DIR, "logs")
+
+# Local path to trained weights file
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+# Download COCO trained weights from Releases if needed
+if not os.path.exists(COCO_MODEL_PATH):
+    utils.download_trained_weights(COCO_MODEL_PATH)
+
+# Directory of images to run detection on
+IMAGE_DIR = os.path.join(ROOT_DIR, "images")
+
+class InferenceConfig(coco.CocoConfig):
+    # Set batch size to 1 since we'll be running inference on
+    # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
 
 config = InferenceConfig()
 config.display()
 
-DEVICE = "/gpu:0"
-TEST_MODE = "inference"
 
-dataset = coco.CocoDataset()
-dataset.load_coco(COCO_DIR, "minival")
-dataset.prepare()
-print("Images: {}\nClasses: {}".format(len(dataset.image_ids), dataset.class_names))
+# Create model object in inference mode.
+model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
 
-# Create model in inference mode
-with tf.device(DEVICE):
-    model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR,
-                              config=config)
+# Load weights trained on MS-COCO
+model.load_weights(COCO_MODEL_PATH, by_name=True)
 
-weights_path = COCO_MODEL_PATH
-
-print("Loading weights ", weights_path)
-model.load_weights(weights_path, by_name=True)
+class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
+               'bus', 'train', 'truck', 'boat', 'traffic light',
+               'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird',
+               'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear',
+               'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie',
+               'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
+               'kite', 'baseball bat', 'baseball glove', 'skateboard',
+               'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup',
+               'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+               'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
+               'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed',
+               'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote',
+               'keyboard', 'cell phone', 'microwave', 'oven', 'toaster',
+               'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors',
+               'teddy bear', 'hair drier', 'toothbrush']
 
 def get_ax(rows=1, cols=1, size=16):
     """Return a Matplotlib Axes array to be used in

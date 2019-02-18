@@ -14,6 +14,7 @@ RUN apt-get update && \
     apt-utils && \
     apt-get install -yq --no-install-recommends --no-upgrade \
     # install system packages
+    software-properties-common \
     wget \
     curl \
     locales \
@@ -83,15 +84,15 @@ RUN cd /tmp && \
 
 # RealSense Libraries
 
-RUN sudo apt-key adv --keyserver keys.gnupg.net --recv-key C8B3A55A6F3EFCDE || \
-    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C8B3A55A6F3EFCDE && \
-    sudo add-apt-repository \
+RUN apt-key adv --keyserver keys.gnupg.net --recv-key C8B3A55A6F3EFCDE || \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C8B3A55A6F3EFCDE && \
+    add-apt-repository \
     "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main" -u && \
     apt-get update && \
-    sudo apt-get install librealsense2-dkms -y && \
-    sudo apt-get install librealsense2-utils -y && \
-    sudo apt-get install librealsense2-dev -y && \
-    sudo apt-get install librealsense2-dbg -y && \
+    apt-get install librealsense2-dkms -y && \
+    apt-get install librealsense2-utils -y && \
+    apt-get install librealsense2-dev -y && \
+    apt-get install librealsense2-dbg -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
