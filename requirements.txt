@@ -1,0 +1,9 @@
+scipy
+Pillow
+matplotlib
+scikit-image
+keras
+opencv-contrib-python
+h5py
+imgaug
+flask
