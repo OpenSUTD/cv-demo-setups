@@ -73,7 +73,7 @@ RUN cd /tmp && \
     $CONDA_DIR/bin/conda install --quiet --yes conda="${MINICONDA_VERSION%.*}.*" && \
     $CONDA_DIR/bin/conda update --all --quiet --yes && \
     conda install -n root conda-build && \
-    conda install -c anaconda tensorflow-gpu=1.11 --quiet --yes && \
+    conda install -c anaconda tensorflow-gpu=1.11 Cython --quiet --yes && \
     conda clean -tipsy && \
     conda build purge-all && \
     rm -rf /home/$NB_USER/.cache

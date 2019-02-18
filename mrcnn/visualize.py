@@ -18,7 +18,7 @@ from skimage.measure import find_contours
 import matplotlib.pyplot as plt
 from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
-import IPython.display
+#import IPython.display
 
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -58,7 +58,9 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
         i += 1
     plt.show()
 
+import functools
 
+@functools.lru_cache(maxsize=128, typed=True)
 def random_colors(N, bright=True):
     """
     Generate random colors.
@@ -108,9 +110,9 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
 
     # If no axis is passed, create one and automatically call show()
-    auto_show = False
-    if not ax:
-        _, ax = plt.subplots(1, figsize=figsize)
+    #auto_show = False
+    #if not ax:
+    #    _, ax = plt.subplots(1, figsize=figsize)
     #    auto_show = True
 
     # Generate random colors
@@ -118,10 +120,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
 
     # Show area outside image boundaries.
     height, width = image.shape[:2]
-    ax.set_ylim(height + 10, -10)
-    ax.set_xlim(-10, width + 10)
     ax.axis('off')
-    ax.set_title(title)
+    #ax.set_title(title)
 
     masked_image = image.astype(np.uint32).copy()
     for i in range(N):
@@ -132,22 +132,21 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             # Skip this instance. Has no bbox. Likely lost in image cropping.
             continue
         y1, x1, y2, x2 = boxes[i]
-        if show_bbox:
-            p = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=2,
-                                alpha=0.7, linestyle="dashed",
-                                edgecolor=color, facecolor='none')
-            ax.add_patch(p)
+        #if show_bbox:
+        #    p = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=2,
+        #                        alpha=0.7, linestyle="dashed",
+        #                        edgecolor=color, facecolor='none')
+        #    ax.add_patch(p)
 
         # Label
         if not captions:
             class_id = class_ids[i]
-            score = scores[i] if scores is not None else None
             label = class_names[class_id]
-            caption = "{} {:.3f}".format(label, score) if score else label
+            caption = class_names[class_id]
         else:
             caption = captions[i]
-        ax.text(x1, y1 + 8, caption,
-                color='w', size=11, backgroundcolor="none")
+        ax.text(x1+50, y1+50, caption,
+                color='w', size=30, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]
