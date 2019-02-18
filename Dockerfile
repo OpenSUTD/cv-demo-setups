@@ -82,10 +82,13 @@ EXPOSE 8080
 EXPOSE 5000
 
 WORKDIR /app
-COPY . /app
+
+ADD requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir -r /app/requirements.txt && \
     rm -rf /home/$NB_USER/.cache
+
+COPY . /app
 
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 

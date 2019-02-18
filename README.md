@@ -41,7 +41,7 @@ docker run --rm --privileged \
  -v /tmp/.X11-unix:/tmp/.X11-unix \
  --device=/dev/dri:/dev/dri \
  -v /dev/video/ \
- tlkh/oh-cv-demo
+ tlkh/oh19-cv-demo
 ```
 
 ## Acknowledgements
