@@ -81,6 +81,20 @@ RUN cd /tmp && \
     conda build purge-all && \
     rm -rf /home/$NB_USER/.cache
 
+# RealSense Libraries
+
+RUN sudo apt-key adv --keyserver keys.gnupg.net --recv-key C8B3A55A6F3EFCDE || \
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C8B3A55A6F3EFCDE && \
+    sudo add-apt-repository \
+    "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main" -u && \
+    apt-get update && \
+    sudo apt-get install librealsense2-dkms -y && \
+    sudo apt-get install librealsense2-utils -y && \
+    sudo apt-get install librealsense2-dev -y && \
+    sudo apt-get install librealsense2-dbg -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \

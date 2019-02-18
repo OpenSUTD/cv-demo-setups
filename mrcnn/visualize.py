@@ -20,6 +20,9 @@ from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
 import IPython.display
 
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
 
@@ -108,7 +111,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     auto_show = False
     if not ax:
         _, ax = plt.subplots(1, figsize=figsize)
-        auto_show = True
+    #    auto_show = True
 
     # Generate random colors
     colors = colors or random_colors(N)
@@ -163,9 +166,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-    if auto_show:
-        plt.show()
-
+    #if auto_show:
+    #    plt.show()
 
 def display_differences(image,
                         gt_box, gt_class_id, gt_mask,
