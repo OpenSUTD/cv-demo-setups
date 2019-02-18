@@ -7,3 +7,4 @@ opencv-contrib-python
 h5py
 imgaug
 flask
+pyrealsense2

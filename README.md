@@ -31,7 +31,18 @@ sudo apt-get install librealsense2-dbg -y
 WIP
 ```
 
+## Running the Demo
 
+```
+xhost +
+docker run --rm \
+ --net=host --ipc=host \
+ -e DISPLAY=$DISPLAY \
+ -v /tmp/.X11-unix:/tmp/.X11-unix \
+ --device=/dev/video0:/dev/video0 \
+ --device=/dev/video1:/dev/video1 \
+ tlkh/oh-cv-demo
+```
 
 ## Acknowledgements
 

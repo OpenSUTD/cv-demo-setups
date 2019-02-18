@@ -25,6 +25,15 @@ RUN apt-get update && \
     libjpeg-dev \
     libpng-dev && \
     ldconfig && \
+    apt-key adv --keyserver keys.gnupg.net --recv-key C8B3A55A6F3EFCDE || \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C8B3A55A6F3EFCDE && \
+    add-apt-repository \
+    "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main" -u && \
+    apt-get update && \
+    apt-get install librealsense2-dkms -y && \
+    apt-get install librealsense2-utils -y && \
+    apt-get install librealsense2-dev -y && \
+    apt-get install librealsense2-dbg -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -51,6 +60,10 @@ RUN groupadd wheel -g 11 && \
     mkdir -p $CONDA_DIR && \
     chown $NB_USER:$NB_GID $CONDA_DIR && \
     chmod g+w /etc/passwd
+
+WORKDIR /app
+
+COPY . /app
 
 ENV MINICONDA_VERSION 4.5.12
 
@@ -82,20 +95,6 @@ RUN cd /tmp && \
     conda build purge-all && \
     rm -rf /home/$NB_USER/.cache
 
-# RealSense Libraries
-
-RUN apt-key adv --keyserver keys.gnupg.net --recv-key C8B3A55A6F3EFCDE || \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C8B3A55A6F3EFCDE && \
-    add-apt-repository \
-    "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main" -u && \
-    apt-get update && \
-    apt-get install librealsense2-dkms -y && \
-    apt-get install librealsense2-utils -y && \
-    apt-get install librealsense2-dev -y && \
-    apt-get install librealsense2-dbg -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
@@ -104,4 +103,5 @@ RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
 EXPOSE 8080
 EXPOSE 5000
 
-WORKDIR /app
+ENTRYPOINT [ "python" ]
+CMD [ "app.py" ]
