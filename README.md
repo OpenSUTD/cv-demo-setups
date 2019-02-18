@@ -35,12 +35,12 @@ WIP
 
 ```
 xhost +
-docker run --rm \
+docker run --rm --privileged \
  --net=host --ipc=host \
- -e DISPLAY=$DISPLAY \
+ --env="DISPLAY" \
  -v /tmp/.X11-unix:/tmp/.X11-unix \
- --device=/dev/video0:/dev/video0 \
- --device=/dev/video1:/dev/video1 \
+ --device=/dev/dri:/dev/dri \
+ -v /dev/video/ \
  tlkh/oh-cv-demo
 ```
 

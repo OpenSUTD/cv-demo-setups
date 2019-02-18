@@ -61,10 +61,6 @@ RUN groupadd wheel -g 11 && \
     chown $NB_USER:$NB_GID $CONDA_DIR && \
     chmod g+w /etc/passwd
 
-WORKDIR /app
-
-COPY . /app
-
 ENV MINICONDA_VERSION 4.5.12
 
 RUN cd /tmp && \
@@ -77,31 +73,24 @@ RUN cd /tmp && \
     $CONDA_DIR/bin/conda install --quiet --yes conda="${MINICONDA_VERSION%.*}.*" && \
     $CONDA_DIR/bin/conda update --all --quiet --yes && \
     conda install -n root conda-build && \
-    conda install -c nvidia -c numba -c pytorch -c conda-forge -c rapidsai -c defaults  --quiet --yes \
-    'cudatoolkit=9.0' \
-    'numpy>=1.16.1' \
-    'numba>=0.41.0dev' \
-    'faiss-gpu' \
-    'blas=*=openblas' \
-    'cython>=0.29' && \
     conda install -c anaconda tensorflow-gpu=1.11 --quiet --yes && \
-    cd /home/$NB_USER && \
-    wget https://raw.githubusercontent.com/tlkh/openhouse-demo-cv/master/requirements.txt && \
-    pip install --no-cache-dir -r /home/$NB_USER/requirements.txt && \
-    pip uninstall pillow -y && \
-    CC="cc -mavx2" pip install -U --force-reinstall --no-cache-dir pillow-simd && \
-    rm /home/$NB_USER/requirements.txt && \
     conda clean -tipsy && \
     conda build purge-all && \
+    rm -rf /home/$NB_USER/.cache
+
+EXPOSE 8080
+EXPOSE 5000
+
+WORKDIR /app
+COPY . /app
+
+RUN pip install --no-cache-dir -r /app/requirements.txt && \
     rm -rf /home/$NB_USER/.cache
 
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
     fix-permissions /home/$NB_USER
-
-EXPOSE 8080
-EXPOSE 5000
 
 ENTRYPOINT [ "python" ]
 CMD [ "app.py" ]
