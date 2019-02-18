@@ -14,10 +14,17 @@ RUN apt-get update && \
     apt-utils && \
     apt-get install -yq --no-install-recommends --no-upgrade \
     # install system packages
+    wget \
+    curl \
+    locales \
+    ca-certificates \
+    fonts-liberation \
+    build-essential \
     libopenblas-base \
     libjpeg-dev \
-    libpng-dev \
-    && apt-get clean && \
+    libpng-dev && \
+    ldconfig && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \

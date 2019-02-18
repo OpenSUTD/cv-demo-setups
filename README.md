@@ -21,6 +21,8 @@ sudo apt-get install librealsense2-dkms -y
 sudo apt-get install librealsense2-utils -y
 sudo apt-get install librealsense2-dev -y
 sudo apt-get install librealsense2-dbg -y
+
+# run realsense-viewer to verify
 ```
 
 ### 2. Demo setup
@@ -29,7 +31,7 @@ sudo apt-get install librealsense2-dbg -y
 WIP
 ```
 
-# run realsense-viewer to verify
+
 
 ## Acknowledgements
 
