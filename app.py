@@ -111,7 +111,7 @@ while True:
 
     depth_image = np.asanyarray(aligned_depth_frame.get_data())
     depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
-    depth_colormap = cv2.resize(depth_colormap, (320,))
+    depth_colormap = cv2.resize(depth_colormap, (320,180))
     depth_colormap = cv2.flip(depth_colormap, 1)
 
     color_image = np.asanyarray(color_frame.get_data())
