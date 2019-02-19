@@ -85,7 +85,7 @@ import functools
 import colorsys
 import random
 
-@functools.lru_cache(maxsize=128, typed=True)
+@functools.lru_cache(maxsize=32, typed=True)
 def random_colors(N, bright=True):
     """
     Generate random colors.
@@ -109,6 +109,21 @@ def apply_mask(image, mask, color, alpha=0.5):
     return image
 
 font = cv2.FONT_HERSHEY_SIMPLEX
+cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
+cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+
+# ======================================
+# capture one image first
+frames = pipeline.wait_for_frames()
+aligned_frames = align.process(frames)
+aligned_depth_frame = aligned_frames.get_depth_frame()
+color_frame = aligned_frames.get_color_frame()
+color_image = np.asanyarray(color_frame.get_data())
+color_image_f = cv2.flip(color_image, 1)
+
+height, width = color_image_f.shape[:2]
+# carry on
+# ======================================
 
 while True:
 
@@ -131,12 +146,12 @@ while True:
     depth_colormap = cv2.flip(depth_colormap, 1)
 
     color_image = np.asanyarray(color_frame.get_data())
-    color_image = cv2.flip(color_image, 1)
+    color_image_f = cv2.flip(color_image, 1)
 
     # Stage 2.
     # begin detection
 
-    r = model.detect([color_image])[0]
+    r = model.detect([color_image_f])[0]
 
     # Expected keys: rois(boxes), masks, class_ids, scores
 
@@ -146,22 +161,20 @@ while True:
     N = boxes.shape[0]
     if not N:
         print("\n*** No instances to display *** \n")
+        masked_image = color_image_f
     else:
-        assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
-
-    colors = random_colors(N)
-    height, width = color_image.shape[:2]
-
-    for i in range(N):
-        if not np.any(boxes[i]):
-            continue
-        color = colors[i]
-        y1, x1, y2, x2 = boxes[i]
-        cent_x, cent_y = int((x1+x2)/2), int((y1+y2)/2)
-        caption = class_names[class_ids[i]]
-        mask = masks[:, :, i]
-        masked_image = apply_mask(color_image, mask, color)
-        cv2.putText(masked_image,caption,(x1, y1), font, 1,(255,255,255), 2, cv2.LINE_AA)
+        #assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
+        colors = random_colors(N)
+        for i in range(N):
+            if not np.any(boxes[i]):
+                continue
+            color = colors[i]
+            y1, x1, y2, x2 = boxes[i]
+            cent_x, cent_y = int((x1+x2)/2), int((y1+y2)/2)
+            caption = class_names[class_ids[i]]
+            mask = masks[:, :, i]
+            masked_image = apply_mask(color_image_f, mask, color)
+            cv2.putText(masked_image,caption,(x1, y1), font, 1,(255,255,255), 2, cv2.LINE_AA)
 
     # Stage 3.
     # draw final image
@@ -172,10 +185,9 @@ while True:
 
     cv2.putText(final_image,'DEPTH IMAGE',(2, 30), font, 1,(255,255,255), 2, cv2.LINE_AA)
 
-    cv2.imshow('frame',final_image)
+    cv2.imshow('window',final_image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-cap.stop()
 pipeline.stop()
 cv2.destroyAllWindows()
