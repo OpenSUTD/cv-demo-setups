@@ -50,7 +50,7 @@ class Camera():
                 continue
 
             depth_image = np.asanyarray(aligned_depth_frame.get_data())
-            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.1), cv2.COLORMAP_RAINBOW)
             depth_colormap = cv2.resize(depth_colormap, (320,180))
             depth_colormap = cv2.flip(depth_colormap, 1)
 
@@ -60,7 +60,7 @@ class Camera():
 
             self.depth_frame = depth_colormap
 
-            time.sleep(0.1)
+            time.sleep(0.05)
 
             if self.stopped:
                 pipeline.stop()
