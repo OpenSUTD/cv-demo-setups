@@ -1,6 +1,6 @@
-# openhouse-demo-cv
+# SUTD Open House 2019 CV Demo
 
-SUTD Open House 2019 CV Demo
+An real-time instance-segmentation computer vision demonstration for SUTD Open House 2019
 
 ## Installation
 
