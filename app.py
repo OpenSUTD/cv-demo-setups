@@ -145,7 +145,6 @@ def random_colors(N, bright=True):
     brightness = 1.0 if bright else 0.7
     hsv = [(i / N, 1, brightness) for i in range(N)]
     colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
-    random.shuffle(colors)
     return colors
 
 def apply_mask(image, mask, color, alpha=0.3):
@@ -162,6 +161,8 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
 cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
 while True:
 
     color_image_f, depth_colormap = capture.read()
@@ -177,6 +178,11 @@ while True:
     else:
         #assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
         input_image = color_image_f.copy()
+
+        faces = face_cascade.detectMultiScale(cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY), 1.3, 5)
+        for (x,y,w,h) in faces:
+            cv2.rectangle(input_image,(x,y),(x+w,y+h),(255,255,0),2)
+
         colors = random_colors(N)
         for i in range(N):
             if not np.any(boxes[i]):
@@ -191,7 +197,7 @@ while True:
 
     masked_image = cv2.resize(masked_image, (1920,1080))
 
-    cv2.putText(depth_colormap,'DEPTH IMAGE',(4, 30), font, 1,(255,255,255), 2, cv2.LINE_AA)
+    cv2.putText(depth_colormap,'DEPTH',(8, 40), font, 1.2,(255,255,255), 3, cv2.LINE_AA)
 
     masked_image[0:depth_colormap.shape[0], 0:depth_colormap.shape[1]] = depth_colormap
 
