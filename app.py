@@ -133,7 +133,6 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
 
 import functools
 import colorsys
-import random
 
 @functools.lru_cache(maxsize=32, typed=True)
 def random_colors(N, bright=True):
