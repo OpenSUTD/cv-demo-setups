@@ -147,14 +147,25 @@ def random_colors(N, bright=True):
     colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
     return colors
 
-def apply_mask(image, mask, color, alpha=0.3):
+def apply_mask(image, mask, color, alpha=0.4):
     """Apply the given mask to the image.
     """
-    for c in range(3):
-        image[:, :, c] = np.where(mask == 1,
-                                  image[:, :, c] *
-                                  (1 - alpha) + alpha * color[c] * 255,
-                                  image[:, :, c])
+    
+    image[:, :, 0] = np.where(mask == 1,
+                                  image[:, :, 0] *
+                                  (1 - alpha) + alpha * color[0] * 255,
+                                  image[:, :, 0])
+
+    image[:, :, 1] = np.where(mask == 1,
+                                  image[:, :, 1] *
+                                  (1 - alpha) + alpha * color[1] * 255,
+                                  image[:, :, 1])
+
+    image[:, :, 2] = np.where(mask == 1,
+                                  image[:, :, 2] *
+                                  (1 - alpha) + alpha * color[2] * 255,
+                                  image[:, :, 2])
+                                  
     return image
 
 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -164,6 +175,7 @@ cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 while True:
+    #start = time.time()
 
     color_image_f, depth_colormap = capture.read()
 
@@ -193,13 +205,17 @@ while True:
             caption = class_names[class_ids[i]]
             mask = masks[:, :, i]
             masked_image = apply_mask(input_image, mask, color)
-            cv2.putText(masked_image,caption,(cent_x, cent_y), font, 1,(255,255,255), 2, cv2.LINE_AA)
+            cv2.putText(masked_image,caption,(cent_x, cent_y), font, 0.8,(255,255,255), 1, cv2.LINE_AA)
 
-    masked_image = cv2.resize(masked_image, (1920,1080))
+    masked_image = cv2.resize(masked_image, (1920,1080), interpolation=cv2.INTER_CUBIC)
 
-    cv2.putText(depth_colormap,'DEPTH',(8, 40), font, 1.2,(255,255,255), 3, cv2.LINE_AA)
+    cv2.putText(depth_colormap,'DEPTH',(8, 40), font, 1.4,(255,255,255), 3, cv2.LINE_AA)
 
     masked_image[0:depth_colormap.shape[0], 0:depth_colormap.shape[1]] = depth_colormap
+
+    #frame_time = time.time() - start
+    #fps = round(1/frame_time,2)
+    #cv2.putText(masked_image,str(fps),(1280, 80), font, 2,(0,0,255), 4, cv2.LINE_AA)
 
     cv2.imshow('window',masked_image)
     if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -1,7 +1,5 @@
-
-# nvidia/cuda
-# https://hub.docker.com/r/nvidia/cuda
-FROM nvidia/cuda:9.0-cudnn7-runtime-ubuntu16.04
+# Latest NGC TensorFlow CUDA9.0 Image
+FROM nvcr.io/nvidia/tensorflow:18.08-py3
 
 LABEL maintainer="Timothy Liu <timothyl@nvidia.com>"
 
@@ -15,6 +13,8 @@ RUN apt-get update && \
     apt-get install -yq --no-install-recommends --no-upgrade \
     # install system packages
     software-properties-common \
+    python3-dev \
+    python3-tk \
     wget \
     curl \
     locales \
@@ -49,35 +49,6 @@ ENV CONDA_DIR=/opt/conda \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
 
-ENV PATH=$CONDA_DIR/bin:$PATH \
-    HOME=/home/$NB_USER
-
-ADD fix-permissions /usr/local/bin/fix-permissions
-
-RUN groupadd wheel -g 11 && \
-    echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
-    useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
-    mkdir -p $CONDA_DIR && \
-    chown $NB_USER:$NB_GID $CONDA_DIR && \
-    chmod g+w /etc/passwd
-
-ENV MINICONDA_VERSION 4.5.12
-
-RUN cd /tmp && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    $CONDA_DIR/bin/conda config --system --prepend channels conda-forge && \
-    $CONDA_DIR/bin/conda config --system --set auto_update_conda false && \
-    $CONDA_DIR/bin/conda config --system --set show_channel_urls true && \
-    $CONDA_DIR/bin/conda install --quiet --yes conda="${MINICONDA_VERSION%.*}.*" && \
-    $CONDA_DIR/bin/conda update --all --quiet --yes && \
-    conda install -n root conda-build && \
-    conda install -c anaconda tensorflow-gpu=1.11 Cython --quiet --yes && \
-    conda clean -tipsy && \
-    conda build purge-all && \
-    rm -rf /home/$NB_USER/.cache
-
 EXPOSE 8080
 EXPOSE 5000
 
@@ -85,17 +56,16 @@ WORKDIR /app
 
 ADD requirements.txt /app/requirements.txt
 
-RUN pip install --no-cache-dir -r /app/requirements.txt && \
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python3 get-pip.py --force-reinstall && \
+    rm get-pip.py && \
+    pip install Cython && \
+    pip install --no-cache-dir -r /app/requirements.txt && \
     rm -rf /home/$NB_USER/.cache
 
 COPY . /app
 
-ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
-
-RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
-    fix-permissions /home/$NB_USER
-
 USER 1000
 
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "python3" ]
 CMD [ "app.py" ]
