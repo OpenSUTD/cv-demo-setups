@@ -71,11 +71,12 @@ nvidia-docker run --rm --privileged \
  --device=/dev/dri:/dev/dri \
  -v /dev/video/ \
  tlkh/oh19-cv-demo:seg-1.0
+# tlkh/oh19-cv-demo:seg-1.0-lowres
 ```
 
 ## Acknowledgements
 
 * Mask R-CNN code and weights are adapted from from Matterport Inc [`matterport/Mask_RCNN`](https://github.com/matterport/Mask_RCNN).
-* The NGC ([NVIDIA GPU Cloud](https://www.nvidia.com/en-sg/gpu-cloud/)) TensorFlow container is used in this project. NVIDIA tuned, tested, certified, and maintained containers for deep learning and HPC frameworks that take full advantage of NVIDIA GPUs on supported systems, such as NVIDIA DGX products.
+* The NGC ([NVIDIA GPU Cloud](https://www.nvidia.com/en-sg/gpu-cloud/)) TensorFlow container is used in this project. NGC containers are NVIDIA tuned, tested, certified, and maintained containers for deep learning and HPC frameworks that take full advantage of NVIDIA GPUs on supported systems, such as NVIDIA DGX products.
 * The website, its software and all content found on it are provided on an “as is” and “as available” basis. Please open an issue if you encounter problems or have a feature request.
 
