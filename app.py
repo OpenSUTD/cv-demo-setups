@@ -24,7 +24,7 @@ class Camera():
 
         config = rs.config()
         config.enable_stream(rs.stream.depth, 640, 360, rs.format.z16, 15)
-        config.enable_stream(rs.stream.color, 640, 360, rs.format.bgr8, 15)
+        config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 15)
 
         profile = config.resolve(pipeline)
 
@@ -56,8 +56,8 @@ class Camera():
 
             color_image = np.asanyarray(color_frame.get_data())
             color_image_f = cv2.flip(color_image, 1)
-            self.colour_frame = color_image_f
 
+            self.colour_frame = color_image_f
             self.depth_frame = depth_colormap
 
             time.sleep(0.05)
@@ -98,7 +98,8 @@ class InferenceConfig(coco.CocoConfig):
     # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
-    IMAGE_MIN_DIM = 360
+    IMAGE_MIN_DIM = 256
+    #IMAGE_MAX_DIM = 384
     IMAGE_MAX_DIM = 640
 
 config = InferenceConfig()
@@ -185,10 +186,10 @@ while True:
     N = boxes.shape[0]
 
     if not N:
-        masked_image = color_image_f.copy()
+        masked_image = color_image_f
     else:
         #assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
-        input_image = color_image_f.copy()
+        input_image = color_image_f
 
         faces = face_cascade.detectMultiScale(cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY), 1.3, 5)
         for (x,y,w,h) in faces:
