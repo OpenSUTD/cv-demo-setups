@@ -23,8 +23,8 @@ class Camera():
         pipeline = rs.pipeline()
 
         config = rs.config()
-        config.enable_stream(rs.stream.depth, 640, 360, rs.format.z16, 15)
-        config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 15)
+        config.enable_stream(rs.stream.depth, 640, 360, rs.format.z16, 6)
+        config.enable_stream(rs.stream.color, 640, 360, rs.format.bgr8, 6)
 
         profile = config.resolve(pipeline)
 
@@ -37,7 +37,7 @@ class Camera():
         align_to = rs.stream.color
         align = rs.align(align_to)
 
-        time.sleep(1.0)
+        #time.sleep(1.0)
 
         # keep looping infinitely until the thread is stopped
         while True:
@@ -62,7 +62,7 @@ class Camera():
             self.colour_frame = color_image_f
             self.depth_frame = depth_colormap
 
-            time.sleep(0.05)
+            time.sleep(1/7)
 
             if self.stopped:
                 pipeline.stop()
@@ -136,37 +136,20 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
 import functools
 import colorsys
 
-def apply_mask(image, mask, color, alpha=0.4):
-    """Apply the given mask to the image.
-    """
-    
-    image[:, :, 0] = np.where(mask == 1,
-                                  image[:, :, 0] *
-                                  (1 - alpha) + alpha * color[0] * 255,
-                                  image[:, :, 0])
-
-    image[:, :, 1] = np.where(mask == 1,
-                                  image[:, :, 1] *
-                                  (1 - alpha) + alpha * color[1] * 255,
-                                  image[:, :, 1])
-
-    image[:, :, 2] = np.where(mask == 1,
-                                  image[:, :, 2] *
-                                  (1 - alpha) + alpha * color[2] * 255,
-                                  image[:, :, 2])
-                                  
-    return image
-
 font = cv2.FONT_HERSHEY_SIMPLEX
 cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
 cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 
+N = 20
+hsv = [(i / N, 1, 1.0) for i in range(N)]
+colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
+
+alpha = 0.5
+
 from numba import jit
 
-@jit(nopython=True)
+@jit(nopython=False)
 def render_masks(image, boxes, masks, class_ids, N):
-    hsv = [(i / N, 1, brightness) for i in range(N)]
-    colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
     for i in range(N):
         if not np.any(boxes[i]):
             continue
