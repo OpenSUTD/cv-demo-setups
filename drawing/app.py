@@ -23,8 +23,8 @@ class Camera():
         pipeline = rs.pipeline()
 
         config = rs.config()
-        config.enable_stream(rs.stream.depth, 640, 360, rs.format.z16, 15)
-        config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 15)
+        config.enable_stream(rs.stream.depth, 640, 360, rs.format.z16, 60)
+        config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 60)
 
         profile = config.resolve(pipeline)
 
@@ -60,7 +60,7 @@ class Camera():
             self.colour_frame = color_image_f
             self.depth_frame = depth_colormap
 
-            time.sleep(0.05)
+            time.sleep(0.03)
 
             if self.stopped:
                 pipeline.stop()
@@ -77,13 +77,13 @@ import imutils
 
 capture = Camera().start()
 
-BUFFER = 64
+BUFFER = 16
 
 # define the lower and upper boundaries of the "green"
 # ball in the HSV color space, then initialize the
 # list of tracked points
-greenLower = (30, 60, 20)
-greenUpper = (60, 255, 255)
+greenLower = (165, 80, 80)
+greenUpper = (175, 255, 255)
 pts = deque(maxlen=BUFFER)
 
 import sys
@@ -158,14 +158,7 @@ while True:
 		((x, y), radius) = cv2.minEnclosingCircle(c)
 		M = cv2.moments(c)
 		center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-
-		# only proceed if the radius meets a minimum size
-		if radius > 10:
-			# draw the circle and centroid on the frame,
-			# then update the list of tracked points
-			cv2.circle(frame, (int(x), int(y)), int(radius),
-				(0, 255, 255), 2)
-			cv2.circle(frame, center, 5, (0, 0, 255), -1)
+		print("HSV", hsv[int(y)][int(x)])
 
 	# update the points queue
 	pts.appendleft(center)
@@ -179,7 +172,7 @@ while True:
 
 		# otherwise, compute the thickness of the line and
 		# draw the connecting lines
-		thickness = int(np.sqrt(BUFFER / float(i + 1)) * 2.5)
+		thickness = int(np.sqrt(BUFFER / float(i + 1)))
 		cv2.line(pose_frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 		
 	output_image = cv2.resize(pose_frame, (1920,1080), interpolation=cv2.INTER_CUBIC)
