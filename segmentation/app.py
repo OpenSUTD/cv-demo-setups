@@ -52,7 +52,7 @@ class Camera():
                 continue
 
             depth_image = np.asanyarray(aligned_depth_frame.get_data())
-            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.1), cv2.COLORMAP_RAINBOW)
+            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.06), cv2.COLORMAP_RAINBOW)
             depth_colormap = cv2.resize(depth_colormap, (320,180))
             depth_colormap = cv2.flip(depth_colormap, 1)
 
@@ -117,15 +117,15 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                'bus', 'train', 'truck', 'boat', 'traffic light',
                'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird',
                'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear',
-               'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie',
-               'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
+               'zebra', 'giraffe', 'bag', 'umbrella', 'bag', 'tie',
+               'suitcase', 'frisbee', 'skis', 'snowboard', 'ball',
                'kite', 'baseball bat', 'baseball glove', 'skateboard',
                'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup',
                'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
                'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
                'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed',
-               'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote',
-               'keyboard', 'cell phone', 'microwave', 'oven', 'toaster',
+               'table', 'toilet', 'monitor', 'laptop', 'mouse', 'remote',
+               'keyboard', 'phone', 'microwave', 'oven', 'toaster',
                'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors',
                'teddy bear', 'hair drier', 'toothbrush']
 
@@ -140,7 +140,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
 cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 
-N = 20
+N = 12
 hsv = [(i / N, 1, 1.0) for i in range(N)]
 colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
 
@@ -172,7 +172,7 @@ def render_masks(image, boxes, masks, class_ids, N):
                                     (1 - alpha) + alpha * color[2] * 255,
                                     image[:, :, 2])
 
-        cv2.putText(image,caption,(cent_x, cent_y), font, 0.8,(255,255,255), 1, cv2.LINE_AA)
+        cv2.putText(image,caption,(cent_x, cent_y), font, 0.8,(60,60,255), 2, cv2.LINE_AA)
 
     return image
 
@@ -187,6 +187,8 @@ while True:
     boxes, masks = r["rois"], r["masks"]
     class_ids = r["class_ids"]
     N = boxes.shape[0]
+    if N>12:
+        N=12
 
     if not N:
         masked_image = color_image_f
