@@ -8,3 +8,4 @@ h5py
 imgaug
 pyrealsense2
 pycocotools
+numba
