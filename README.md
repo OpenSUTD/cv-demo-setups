@@ -1,6 +1,9 @@
 # SUTD Open House 2019 CV Demo
 
-An real-time instance-segmentation computer vision demonstration for SUTD Open House 2019
+Two real-time computer visions demonstration for SUTD Open House 2019.
+
+1. Instance segmentation
+2. Object tracking + OpenPose
 
 ## Installation
 
@@ -60,9 +63,10 @@ apt-get install nvidia-docker2=2.0.3+docker18.06.1-1 nvidia-container-runtime=2.
 
 ```
 # one time only
-docker pull tlkh/oh19-cv-demo:seg-1.0
+docker pull tlkh/oh19-cv-demo:seg
+docker pull tlkh/oh19-cv-demo:draw
 
-# to run the demo
+# to run the segmentation demo
 xhost +
 nvidia-docker run --rm --privileged \
  --net=host --ipc=host \
@@ -70,13 +74,23 @@ nvidia-docker run --rm --privileged \
  -v /tmp/.X11-unix:/tmp/.X11-unix \
  --device=/dev/dri:/dev/dri \
  -v /dev/video/ \
- tlkh/oh19-cv-demo:seg-1.0
-# tlkh/oh19-cv-demo:seg-1.0-lowres
+ tlkh/oh19-cv-demo:seg
+
+ # to run the drawing+OpenPose demo
+xhost +
+nvidia-docker run --rm --privileged \
+ --net=host --ipc=host \
+ --env="DISPLAY" \
+ -v /tmp/.X11-unix:/tmp/.X11-unix \
+ --device=/dev/dri:/dev/dri \
+ -v /dev/video/ \
+ tlkh/oh19-cv-demo:draw
 ```
 
 ## Acknowledgements
 
 * Mask R-CNN code and weights are adapted from from Matterport Inc [`matterport/Mask_RCNN`](https://github.com/matterport/Mask_RCNN).
+* OpenPose python bindings were used. View the CMU OpenPose project at [`CMU-Perceptual-Computing-Lab/openpose`](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
 * The NGC ([NVIDIA GPU Cloud](https://www.nvidia.com/en-sg/gpu-cloud/)) TensorFlow container is used in this project. NGC containers are NVIDIA tuned, tested, certified, and maintained containers for deep learning and HPC frameworks that take full advantage of NVIDIA GPUs on supported systems, such as NVIDIA DGX products.
 * The website, its software and all content found on it are provided on an “as is” and “as available” basis. Please open an issue if you encounter problems or have a feature request.
 

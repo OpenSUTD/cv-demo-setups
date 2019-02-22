@@ -1,2 +1,5 @@
-# Python API Examples
-This folder provides examples to the basic OpenPose Python API. The analogous C++ API is exposed in [examples/tutorial_api_cpp/](../tutorial_api_cpp/).
+# Drawing Demo
+
+Dockerfile-base builds the OpenPose base image, Dockerfile builds the final demo image.
+
+This lets people draw on the screen with a bright pink paddle, and also demos OpenPose.

@@ -43,22 +43,15 @@ class Camera():
 
             aligned_frames = align.process(frames)
 
-            aligned_depth_frame = aligned_frames.get_depth_frame()
             color_frame = aligned_frames.get_color_frame()
 
             if not aligned_depth_frame or not color_frame:
                 continue
 
-            depth_image = np.asanyarray(aligned_depth_frame.get_data())
-            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.1), cv2.COLORMAP_RAINBOW)
-            depth_colormap = cv2.resize(depth_colormap, (320,180))
-            depth_colormap = cv2.flip(depth_colormap, 1)
-
             color_image = np.asanyarray(color_frame.get_data())
             color_image_f = cv2.flip(color_image, 1)
 
             self.colour_frame = color_image_f
-            self.depth_frame = depth_colormap
 
             time.sleep(0.03)
 
@@ -67,7 +60,7 @@ class Camera():
                 return
 
     def read(self):
-        return self.colour_frame, self.depth_frame
+        return self.colour_frame
 
     def stop(self):
         self.stopped = True
@@ -121,7 +114,7 @@ cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 # keep looping
 while True:
 	# grab the current frame
-	raw_image, depth_colormap = capture.read()
+	raw_image = capture.read()
 
 	frame = cv2.resize(raw_image, (640, 360))
 
@@ -172,7 +165,7 @@ while True:
 
 		# otherwise, compute the thickness of the line and
 		# draw the connecting lines
-		thickness = int(np.sqrt(BUFFER / float(i + 1)))
+		thickness = int(np.sqrt(BUFFER / float(i + 1) * 2))
 		cv2.line(pose_frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 		
 	output_image = cv2.resize(pose_frame, (1920,1080), interpolation=cv2.INTER_CUBIC)
