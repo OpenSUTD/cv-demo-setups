@@ -8,7 +8,10 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \
     apt-get install -yq --no-install-recommends --no-upgrade \
-    apt-utils && \
+    apt-utils software-properties-common && \
+    add-apt-repository ppa:jonathonf/gcc-7.1 && \
+    apt-get update && \
+    apt-get install gcc-7 g++-7 gfortran-7 -y && \
     apt-get install -yq --no-install-recommends --no-upgrade \
     # install system packages
     software-properties-common \
@@ -62,7 +65,7 @@ EXPOSE 5000
 
 WORKDIR /app
 
-ADD requirements.txt /app/requirements.txt
+COPY . /app
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python3 get-pip.py --force-reinstall && \
@@ -73,4 +76,10 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
 
 RUN git clone https://github.com/tlkh/openpose.git && \
     cd openpose/ && mkdir build && cd build && \
+    cp ../docker_files/CMakeLists.txt ../CMakeLists.txt && \
     cmake .. && make -j && cd python && make install
+
+USER 1000
+
+ENTRYPOINT [ "python3" ]
+CMD [ "demo.py" ]
