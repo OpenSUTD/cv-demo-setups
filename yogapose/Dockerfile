@@ -60,24 +60,24 @@ ENV CONDA_DIR=/opt/conda \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
 
-EXPOSE 8080
-EXPOSE 5000
-
 WORKDIR /app
 
-COPY . /app
+COPY requirements.txt /app/requirements.txt
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python3 get-pip.py --force-reinstall && \
     rm get-pip.py && \
-    pip install Cython && \
+    pip install --no-cache-dir Cython && \
     pip install --no-cache-dir -r /app/requirements.txt && \
-    rm -rf /home/$NB_USER/.cache
+    rm -rf /home/$NB_USER/.cache && \
+    rm -rf /tmp/*
 
 RUN git clone https://github.com/tlkh/openpose.git && \
     cd openpose/ && mkdir build && cd build && \
     cp ../docker_files/CMakeLists.txt ../CMakeLists.txt && \
     cmake .. && make -j && cd python && make install
+
+COPY . /app
 
 USER 1000
 
