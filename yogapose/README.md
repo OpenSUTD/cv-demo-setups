@@ -1,3 +1,46 @@
+# Running Yogapose
+
+We've containerized the application.
+
+Requirements to run the demo:
+
+* NVIDIA drivers >=410
+* NVIDIA container runtime (nvidia-docker)
+
+If your system does not meet the above requirements, you can use this shortcut script to install drivers, CUDA toolkit and nvidia-docker:
+
+```bash
+sudo su root
+curl https://getcuda.ml/ubuntu.sh | bash
+# system will reboot automatically
+```
+
+To pull the container (only needed once):
+
+```bash
+docker pull opensutd/yogapose:latest
+```
+
+To run the demo:
+
+```bash
+# enable display
+xhost +
+
+# enable webcam
+sudo chmod -R 777 /dev/video0
+
+# start the demo
+nvidia-docker run --rm --privileged \
+  --net=host --ipc=host \
+  --env="DISPLAY" -v /tmp/.X11-unix:/tmp/.X11-unix \
+  --env TF_FORCE_GPU_ALLOW_GROWTH=true \
+  --device=/dev/video0:/dev/video0 \
+  opensutd/yogapose:latest
+```
+
+Original README below
+
 # CV-pose-detection
 This project is concerned with verifying whether the user is performing yoga poses correctly. To do so, we extract the user's pose information from an image of him using OpenPose and compare it with the target yoga pose. If the two poses have a high similarity score, we treat the user's pose as correct. Two methods of comparison were attempted and they are namely cosine similarity and using a fully connected neural network. The neural network was found to outperform cosine similarity significantly when they were evaluated through their receiver operating characteristics (ROC). The demo script uses the neural network for comparison. The neural network is also affectionately named ComparatorNet. 
 
