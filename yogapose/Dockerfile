@@ -51,9 +51,7 @@ RUN apt-get update && \
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
 
-ENV CONDA_DIR=/opt/conda \
-    SHELL=/bin/bash \
-    NB_USER=jovyan \
+ENV SHELL=/bin/bash \
     NB_UID=1000 \
     NB_GID=100 \
     LC_ALL=en_US.UTF-8 \
