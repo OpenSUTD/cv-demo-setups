@@ -21,6 +21,24 @@ To pull the container (only needed once):
 docker pull opensutd/yogapose:latest
 ```
 
+>If you want to use an external webcam, you should disable the integrated one.
+>
+>Run the following script in terminal (paste in as one line):
+>
+>```bash
+>for device in $(ls /sys/bus/usb/devices/*/product); do 
+>  echo $device; cat $device; 
+>done
+>```
+>
+>Look for the `/sys/bus/usb/devices/1-X/product` that corresponds to the webcam.
+>
+>You can disable it with a command like the following (be sure to substitute `1-X` with the correct value.
+>
+>```bash
+>echo '1-X' | sudo tee /sys/bus/usb/drivers/usb/unbind
+>```
+
 To run the demo:
 
 ```bash
