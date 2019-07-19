@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/pytorch:19.06-py3
+FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu16.04
 
 LABEL maintainer="Timothy Liu <timothy_liu@mymail.sutd.edu.sg>"
 
